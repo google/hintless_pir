@@ -1,0 +1,155 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# rules_proto defines abstract rules for building Protocol Buffers.
+# https://github.com/bazelbuild/rules_proto
+http_archive(
+    name = "rules_proto",
+    sha256 = "dc3fb206a2cb3441b485eb1e423165b231235a1ea9b031b4433cf7bc1fa460dd",
+    strip_prefix = "rules_proto-5.3.0-21.7",
+    urls = [
+        "https://github.com/bazelbuild/rules_proto/archive/refs/tags/5.3.0-21.7.tar.gz",
+    ],
+)
+
+load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
+
+rules_proto_dependencies()
+
+rules_proto_toolchains()
+
+# rules_cc defines rules for generating C++ code from Protocol Buffers.
+# https://github.com/bazelbuild/rules_cc
+http_archive(
+    name = "rules_cc",
+    sha256 = "f34aa18eaea0b1ae766d7e9c43a0efdaf83ea86b0086e53e2f2e7792d0219499",
+    strip_prefix = "rules_cc-aa19278bbda227204e05e5f2f550e7a1913fb580",
+    urls = [
+        "https://github.com/bazelbuild/rules_cc/archive/aa19278bbda227204e05e5f2f550e7a1913fb580.zip",
+    ],
+)
+
+load("@rules_cc//cc:repositories.bzl", "rules_cc_dependencies")
+
+rules_cc_dependencies()
+
+# io_bazel_rules_go defines rules for generating C++ code from Protocol Buffers.
+# https://github.com/bazelbuild/rules_go
+http_archive(
+    name = "io_bazel_rules_go",
+    integrity = "sha256-fHbWI2so/2laoozzX5XeMXqUcv0fsUrHl8m/aE8Js3w=",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.44.2/rules_go-v0.44.2.zip",
+        "https://github.com/bazelbuild/rules_go/releases/download/v0.44.2/rules_go-v0.44.2.zip",
+    ],
+)
+
+load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+
+go_rules_dependencies()
+
+go_register_toolchains(version = "1.20.7")
+
+# gtest
+# https://github.com/google/googletest
+http_archive(
+    name = "com_github_google_googletest",
+    sha256 = "3e91944af2d909a79f18ee9760765624810146ccfae8f1a8f990037a1677d44b",
+    strip_prefix = "googletest-ac7a126f39d5bcd909b78c9e69900c76659b1bbb",
+    urls = [
+        "https://github.com/google/googletest/archive/ac7a126f39d5bcd909b78c9e69900c76659b1bbb.zip",
+    ],
+)
+
+# abseil-cpp
+# https://github.com/abseil/abseil-cpp
+http_archive(
+    name = "com_google_absl",
+    sha256 = "3c743204df78366ad2eaf236d6631d83f6bc928d1705dd0000b872e53b73dc6a",
+    strip_prefix = "abseil-cpp-20240116.1",
+    urls = [
+         "https://github.com/abseil/abseil-cpp/releases/download/20240116.1/abseil-cpp-20240116.1.tar.gz",
+    ],
+)
+
+# Benchmarks
+# https://github.com/google/benchmark
+http_archive(
+    name = "com_github_google_benchmark",
+    sha256 = "5f98b44165f3250f1d749b728018318d654f763ea0f4d7ea156e10e6e0cc678a",
+    strip_prefix = "benchmark-5e78bedfb07c615edb2b646d1e354980268c1728",
+    urls = [
+        "https://github.com/google/benchmark/archive/5e78bedfb07c615edb2b646d1e354980268c1728.zip",
+    ],
+)
+
+# rules_license needed for license() rule
+# https://github.com/bazelbuild/rules_license
+http_archive(
+    name = "rules_license",
+    sha256 = "6157e1e68378532d0241ecd15d3c45f6e5cfd98fc10846045509fb2a7cc9e381",
+    urls = [
+        "https://github.com/bazelbuild/rules_license/releases/download/0.0.4/rules_license-0.0.4.tar.gz",
+    ],
+)
+
+# gflags needed for glog.
+# https://github.com/gflags/gflags
+http_archive(
+    name = "com_github_gflags_gflags",
+    sha256 = "017e0a91531bfc45be9eaf07e4d8fed33c488b90b58509dbd2e33a33b2648ae6",
+    strip_prefix = "gflags-a738fdf9338412f83ab3f26f31ac11ed3f3ec4bd",
+    urls = [
+        "https://github.com/gflags/gflags/archive/a738fdf9338412f83ab3f26f31ac11ed3f3ec4bd.zip",
+    ],
+)
+
+# glog needed by SHELL
+# https://github.com/google/glog
+http_archive(
+    name = "com_github_google_glog",
+    sha256 = "0f91ee6cc1edc3b1c53a286382e69a37e5d172ce208b7e5b305be8770d8c21b1",
+    strip_prefix = "glog-f545ff5e7d7f3df95f6e86c8cb987d9d9d4bd481",
+    urls = [
+        "https://github.com/google/glog/archive/f545ff5e7d7f3df95f6e86c8cb987d9d9d4bd481.zip",
+    ],
+)
+
+# Tink
+http_archive(
+    name = "com_github_tink_crypto_tink_cc",
+    urls = ["https://github.com/tink-crypto/tink-cc/archive/refs/tags/v2.0.0.zip"],
+    strip_prefix = "tink-cc-2.0.0",
+    sha256 = "103ddfce800e77f3b3b6b2c808a8611bc734b31ddb12fbcfd8bebc1b96a7e963",
+)
+
+# Load Tink dependencies.
+
+load("@com_github_tink_crypto_tink_cc//:tink_cc_deps.bzl", "tink_cc_deps")
+
+tink_cc_deps()
+
+load("@com_github_tink_crypto_tink_cc//:tink_cc_deps_init.bzl", "tink_cc_deps_init")
+
+tink_cc_deps_init()
+
+# SHELL for rlwe-based homomorphic encryption.
+# https://github.com/google/shell-encryption
+http_archive(
+    name = "com_github_google_shell-encryption",
+    sha256 = "d408b12e5e1ec7c5213c2f06b30eb7042208ddf111c5b68d2a053e57ad8b95b8",
+    strip_prefix = "shell-encryption-4f812b73ad8b1437eaf46a0dcb04fc326b49185b",
+    urls = [
+        "https://github.com/google/shell-encryption/archive/4f812b73ad8b1437eaf46a0dcb04fc326b49185b.zip",
+    ],
+)
+
+# Eigen
+http_archive(
+    name = "com_gitlab_libeigen-eigen",
+    build_file = "@//:bazel/eigen.bzl",
+    sha256 = "1ccaabbfe870f60af3d6a519c53e09f3dcf630207321dffa553564a8e75c4fc8",
+    strip_prefix = "eigen-3.4.0",
+    urls = [
+        "https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.zip",
+    ],
+)

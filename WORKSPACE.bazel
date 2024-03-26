@@ -136,10 +136,10 @@ tink_cc_deps_init()
 # https://github.com/google/shell-encryption
 http_archive(
     name = "com_github_google_shell-encryption",
-    sha256 = "d408b12e5e1ec7c5213c2f06b30eb7042208ddf111c5b68d2a053e57ad8b95b8",
-    strip_prefix = "shell-encryption-4f812b73ad8b1437eaf46a0dcb04fc326b49185b",
+    sha256 = "b2bad01c66debc8f437580f2016e8701f3487d473b3e7cb27e78f36b33b256ba",
+    strip_prefix = "shell-encryption-8eecd054a939788db923ad1e28787858f47c0aa3",
     urls = [
-        "https://github.com/google/shell-encryption/archive/4f812b73ad8b1437eaf46a0dcb04fc326b49185b.zip",
+        "https://github.com/google/shell-encryption/archive/8eecd054a939788db923ad1e28787858f47c0aa3.zip",
     ],
 )
 

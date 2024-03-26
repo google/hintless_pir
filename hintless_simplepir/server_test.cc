@@ -18,13 +18,12 @@
 #include <string>
 
 #include "absl/log/check.h"
-#include "absl/random/random.h"
 #include "absl/status/status.h"
-#include "absl/types/span.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "hintless_simplepir/database.h"
 #include "hintless_simplepir/parameters.h"
+#include "hintless_simplepir/testing.h"
 #include "hintless_simplepir/utils.h"
 #include "linpir/parameters.h"
 #include "lwe/types.h"
@@ -37,6 +36,7 @@ namespace hintless_simplepir {
 namespace {
 
 using rlwe::testing::StatusIs;
+using ::testing::HasSubstr;
 using RlweInteger = Parameters::RlweInteger;
 using Prng = rlwe::SingleThreadHkdfPrng;
 
@@ -68,20 +68,8 @@ class ServerTest : public ::testing::Test {
     server_ = Server::Create(kParameters).value();
     auto database = server_->GetDatabase();
     for (int i = 0; i < kParameters.db_rows * kParameters.db_cols; ++i) {
-      CHECK_OK(database->Append(GenerateRandomRecord(kParameters)));
+      CHECK_OK(database->Append(testing::GenerateRandomRecord(kParameters)));
     }
-  }
-
-  static std::string GenerateRandomRecord(const Parameters& params) {
-    int num_bytes = DivAndRoundUp(params.db_record_bit_size, 8);
-    std::string record(num_bytes, 0);
-    absl::BitGen bitgen;
-    for (int i = 0; i < num_bytes; ++i) {
-      record[i] = absl::Uniform<unsigned char>(bitgen);
-    }
-    char mask = (1 << (params.db_record_bit_size % 8)) - 1;
-    record[num_bytes - 1] = record[num_bytes - 1] & mask;
-    return record;
   }
 
   std::unique_ptr<Server> server_;
@@ -93,7 +81,7 @@ TEST(Server, CreateFailsIfInvalidPrngType) {
   };
   EXPECT_THAT(Server::Create(params),
               StatusIs(absl::StatusCode::kInvalidArgument,
-                       testing::HasSubstr("Invalid PRNG type")));
+                       HasSubstr("Invalid PRNG type")));
 }
 
 TEST(Server, Create) {
@@ -152,7 +140,7 @@ TEST_F(ServerTest, HandleRequestFailsIfNotPreprocessed) {
       SerializeLweCiphertext(lwe::Vector::Zero(kParameters.db_cols));
   EXPECT_THAT(this->server_->HandleRequest(request),
               StatusIs(absl::StatusCode::kFailedPrecondition,
-                       testing::HasSubstr("Server has not been preprocessed")));
+                       HasSubstr("Server has not been preprocessed")));
 }
 
 TEST_F(ServerTest, HandleRequestFailsIfIncorrectLinPirRequest) {
@@ -162,10 +150,9 @@ TEST_F(ServerTest, HandleRequestFailsIfIncorrectLinPirRequest) {
       SerializeLweCiphertext(lwe::Vector::Zero(kParameters.db_cols));
 
   // No LinPIR request
-  EXPECT_THAT(
-      this->server_->HandleRequest(request),
-      StatusIs(absl::StatusCode::kInvalidArgument,
-               testing::HasSubstr("unexpected number of LinPir requests")));
+  EXPECT_THAT(this->server_->HandleRequest(request),
+              StatusIs(absl::StatusCode::kInvalidArgument,
+                       HasSubstr("unexpected number of LinPir requests")));
 }
 
 }  // namespace

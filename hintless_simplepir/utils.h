@@ -52,8 +52,9 @@ inline std::vector<lwe::Integer> SplitRecord(absl::string_view record,
     int num_available_ptxt_bits =
         std::min(8, params.lwe_plaintext_bit_size - num_filled_ptxt_bits);
     int num_fill_bits = std::min(num_available_ptxt_bits, num_remaining_bits);
-    char mask = (1 << num_fill_bits) - 1;
-    curr_bits |= static_cast<lwe::Integer>(*it & mask) << num_filled_ptxt_bits;
+    lwe::Integer mask = (lwe::Integer{1} << num_fill_bits) - 1;
+    curr_bits |= (static_cast<lwe::Integer>(*it) & mask)
+                 << num_filled_ptxt_bits;
     num_filled_ptxt_bits += num_fill_bits;
     num_remaining_bits -= num_fill_bits;
 
@@ -65,7 +66,8 @@ inline std::vector<lwe::Integer> SplitRecord(absl::string_view record,
       shard_idx++;
 
       // Extract the remaining bits in `*it` and use them for the next shard.
-      curr_bits = static_cast<lwe::Integer>(*it & (~mask)) >> num_fill_bits;
+      mask = (lwe::Integer{1} << 8) - mask;
+      curr_bits = (static_cast<lwe::Integer>(*it) & mask) >> num_fill_bits;
       num_filled_ptxt_bits = 8 - num_fill_bits;
     }
   }

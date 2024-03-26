@@ -17,11 +17,10 @@
 #include <string>
 #include <vector>
 
-#include "absl/random/random.h"
-#include "absl/types/span.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "hintless_simplepir/parameters.h"
+#include "hintless_simplepir/testing.h"
 #include "lwe/types.h"
 
 namespace hintless_pir {
@@ -51,21 +50,9 @@ const std::vector<Parameters> kTestParameters{
     },
 };
 
-static std::string GenerateRandomRecord(const Parameters& params) {
-  int num_bytes = DivAndRoundUp(params.db_record_bit_size, 8);
-  std::string record(num_bytes, 0);
-  absl::BitGen bitgen;
-  for (int i = 0; i < num_bytes; ++i) {
-    record[i] = absl::Uniform<unsigned char>(bitgen);
-  }
-  char mask = (1 << (params.db_record_bit_size % 8)) - 1;
-  record[num_bytes - 1] = record[num_bytes - 1] & mask;
-  return record;
-}
-
 TEST(UtilsTest, SplitAndReconstruct) {
   for (auto const& params : kTestParameters) {
-    std::string record = GenerateRandomRecord(params);
+    std::string record = testing::GenerateRandomRecord(params);
 
     int expected_num_shards =
         DivAndRoundUp(params.db_record_bit_size, params.lwe_plaintext_bit_size);

@@ -86,6 +86,17 @@ cc_library(
     ],
 )
 
+# Test helpers.
+cc_library(
+    name = "testing",
+    hdrs = ["testing.h"],
+    deps = [
+        ":parameters",
+        ":utils",
+        "@com_google_absl//absl/random",
+    ],
+)
+
 # Utilities
 cc_library(
     name = "utils",
@@ -105,14 +116,12 @@ cc_test(
     srcs = ["utils_test.cc"],
     deps = [
         ":parameters",
+        ":testing",
         ":utils",
         "//lwe:types",
         "@com_github_google_googletest//:gtest_main",
         "@com_github_google_shell-encryption//shell_encryption/testing:status_testing",
-        "@com_gitlab_libeigen-eigen//:eigen3",
-        "@com_google_absl//absl/random",
         "@com_google_absl//absl/strings:string_view",
-        "@com_google_absl//absl/types:span",
     ],
 )
 
@@ -141,6 +150,7 @@ cc_test(
     deps = [
         ":database",
         ":parameters",
+        ":testing",
         ":utils",
         "//lwe:lwe_symmetric_encryption",
         "//lwe:types",
@@ -149,7 +159,6 @@ cc_test(
         "@com_github_google_shell-encryption//shell_encryption/testing:status_testing",
         "@com_github_google_shell-encryption//shell_encryption/testing:testing_prng",
         "@com_gitlab_libeigen-eigen//:eigen3",
-        "@com_google_absl//absl/random",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/types:span",
     ],
@@ -190,6 +199,7 @@ cc_test(
         ":database",
         ":parameters",
         ":server",
+        ":testing",
         ":utils",
         "//linpir:parameters",
         "//lwe:types",
@@ -197,11 +207,8 @@ cc_test(
         "@com_github_google_shell-encryption//shell_encryption/prng:single_thread_hkdf_prng",
         "@com_github_google_shell-encryption//shell_encryption/testing:matchers",
         "@com_github_google_shell-encryption//shell_encryption/testing:status_testing",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/log:check",
-        "@com_google_absl//absl/random",
         "@com_google_absl//absl/status",
-        "@com_google_absl//absl/types:span",
     ],
 )
 

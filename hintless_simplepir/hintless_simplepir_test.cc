@@ -34,7 +34,7 @@ using RlweInteger = Parameters::RlweInteger;
 
 const Parameters kParameters{
     .db_rows = 8,
-    .db_cols = 1024,
+    .db_cols = 8,
     .db_record_bit_size = 16,
     .lwe_secret_dim = 1400,
     .lwe_modulus_bit_size = 32,

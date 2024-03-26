@@ -20,12 +20,12 @@
 #include <vector>
 
 #include "Eigen/Core"
-#include "absl/random/random.h"
 #include "absl/status/status.h"
 #include "absl/types/span.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "hintless_simplepir/parameters.h"
+#include "hintless_simplepir/testing.h"
 #include "hintless_simplepir/utils.h"
 #include "lwe/lwe_symmetric_encryption.h"
 #include "lwe/types.h"
@@ -38,6 +38,7 @@ namespace hintless_simplepir {
 namespace {
 
 using rlwe::testing::StatusIs;
+using ::testing::HasSubstr;
 using Prng = rlwe::testing::TestingPrng;
 
 const Parameters kParameters{
@@ -61,18 +62,6 @@ class DatabaseTest : public ::testing::Test {
     lwe_query_pad_ = std::make_unique<lwe::Matrix>(std::move(lwe_query_pad));
   }
 
-  static std::string GenerateRandomRecord(const Parameters& params) {
-    int num_bytes = DivAndRoundUp(params.db_record_bit_size, 8);
-    std::string record(num_bytes, 0);
-    absl::BitGen bitgen;
-    for (int i = 0; i < num_bytes; ++i) {
-      record[i] = absl::Uniform<unsigned char>(bitgen);
-    }
-    char mask = (1 << (params.db_record_bit_size % 8)) - 1;
-    record[num_bytes - 1] = record[num_bytes - 1] & mask;
-    return record;
-  }
-
   std::unique_ptr<Prng> prng_;
   std::unique_ptr<lwe::Matrix> lwe_query_pad_;
 };
@@ -89,7 +78,7 @@ TEST(Database, SetLweQueryPadFailsWithNullPointer) {
   ASSERT_OK_AND_ASSIGN(auto database, Database::Create(kParameters));
   EXPECT_THAT(database->UpdateLweQueryPad(/*lwe_query_pad=*/nullptr),
               StatusIs(absl::StatusCode::kInvalidArgument,
-                       testing::HasSubstr("`lwe_query_pad` must not be null")));
+                       HasSubstr("`lwe_query_pad` must not be null")));
 }
 
 TEST_F(DatabaseTest, AppendFailsIfRecordHasIncorrectSize) {
@@ -99,11 +88,11 @@ TEST_F(DatabaseTest, AppendFailsIfRecordHasIncorrectSize) {
   std::string short_record(record_size - 1, 0);
   EXPECT_THAT(database->Append(short_record),
               StatusIs(absl::StatusCode::kInvalidArgument,
-                       testing::HasSubstr("`record` has incorrect size")));
+                       HasSubstr("`record` has incorrect size")));
   std::string long_record(record_size + 1, 0);
   EXPECT_THAT(database->Append(long_record),
               StatusIs(absl::StatusCode::kInvalidArgument,
-                       testing::HasSubstr("`record` has incorrect size")));
+                       HasSubstr("`record` has incorrect size")));
 }
 
 TEST_F(DatabaseTest, AppendFailsIfDatabaseIsFull) {
@@ -124,7 +113,7 @@ TEST_F(DatabaseTest, AppendFailsIfDatabaseIsFull) {
   ASSERT_OK_AND_ASSIGN(auto database, Database::Create(params));
   ASSERT_OK(database->UpdateLweQueryPad(this->lwe_query_pad_.get()));
   for (int i = 0; i < params.db_rows * params.db_cols; ++i) {
-    std::string record = GenerateRandomRecord(params);
+    std::string record = testing::GenerateRandomRecord(params);
     ASSERT_OK(database->Append(record));
   }
   ASSERT_EQ(database->NumRecords(), params.db_rows * params.db_cols);
@@ -133,7 +122,7 @@ TEST_F(DatabaseTest, AppendFailsIfDatabaseIsFull) {
   std::string dummy_record(record_size, 0);
   EXPECT_THAT(database->Append(dummy_record),
               StatusIs(absl::StatusCode::kInvalidArgument,
-                       testing::HasSubstr("Database is full")));
+                       HasSubstr("Database is full")));
 }
 
 TEST_F(DatabaseTest, AppendRecords) {
@@ -143,7 +132,7 @@ TEST_F(DatabaseTest, AppendRecords) {
 
   // Append a row of records to the database.
   for (int i = 0; i < kParameters.db_cols; ++i) {
-    std::string record = GenerateRandomRecord(kParameters);
+    std::string record = testing::GenerateRandomRecord(kParameters);
     ASSERT_OK(database->Append(record));
     EXPECT_EQ(database->NumRecords(), i + 1);
     ASSERT_OK_AND_ASSIGN(std::string retrieved, database->Record(i));
@@ -159,7 +148,7 @@ TEST_F(DatabaseTest, UpdateHintsFailsIfLweQueryPadIsNotSet) {
   ASSERT_OK_AND_ASSIGN(auto database, Database::Create(kParameters));
   EXPECT_THAT(database->UpdateHints(),
               StatusIs(absl::StatusCode::kFailedPrecondition,
-                       testing::HasSubstr("LWE query pad not set")));
+                       HasSubstr("LWE query pad not set")));
 }
 
 TEST_F(DatabaseTest, UpdateHints) {
@@ -168,7 +157,7 @@ TEST_F(DatabaseTest, UpdateHints) {
 
   // A database holding a partially filled row.
   for (int i = 0; i < kParameters.db_cols - 1; ++i) {
-    std::string record = GenerateRandomRecord(kParameters);
+    std::string record = testing::GenerateRandomRecord(kParameters);
     ASSERT_OK(database->Append(record));
   }
   ASSERT_EQ(database->NumRecords(), kParameters.db_cols - 1);
@@ -185,7 +174,7 @@ TEST_F(DatabaseTest, UpdateHints) {
 
   // Fill in another row into the database.
   for (int i = 0; i < kParameters.db_cols; ++i) {
-    std::string record = GenerateRandomRecord(kParameters);
+    std::string record = testing::GenerateRandomRecord(kParameters);
     ASSERT_OK(database->Append(record));
   }
   ASSERT_EQ(database->NumRecords(), 2 * kParameters.db_cols - 1);
@@ -209,20 +198,20 @@ TEST_F(DatabaseTest, AccessRecordWithInvalidIndex) {
   // The database is empty now, so accessing record will fail for any index
   EXPECT_THAT(database->Record(-1),
               StatusIs(absl::StatusCode::kInvalidArgument,
-                       testing::HasSubstr("`index` is out of range")));
+                       HasSubstr("`index` is out of range")));
   EXPECT_THAT(database->Record(0),
               StatusIs(absl::StatusCode::kInvalidArgument,
-                       testing::HasSubstr("`index` is out of range")));
+                       HasSubstr("`index` is out of range")));
 
   // Append a record.
-  std::string record = GenerateRandomRecord(kParameters);
+  std::string record = testing::GenerateRandomRecord(kParameters);
   ASSERT_OK(database->Append(record));
   EXPECT_THAT(database->Record(-1),
               StatusIs(absl::StatusCode::kInvalidArgument,
-                       testing::HasSubstr("`index` is out of range")));
+                       HasSubstr("`index` is out of range")));
   EXPECT_THAT(database->Record(1),
               StatusIs(absl::StatusCode::kInvalidArgument,
-                       testing::HasSubstr("`index` is out of range")));
+                       HasSubstr("`index` is out of range")));
 }
 
 TEST_F(DatabaseTest, InnerProductWith) {
@@ -231,7 +220,7 @@ TEST_F(DatabaseTest, InnerProductWith) {
 
   // A database holding a partially filled row.
   for (int i = 0; i < kParameters.db_cols - 1; ++i) {
-    std::string record = GenerateRandomRecord(kParameters);
+    std::string record = testing::GenerateRandomRecord(kParameters);
     ASSERT_OK(database->Append(record));
   }
   ASSERT_OK(database->UpdateHints());

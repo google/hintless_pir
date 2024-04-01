@@ -282,3 +282,26 @@ cc_test(
         "@com_google_absl//absl/status:statusor",
     ],
 )
+
+# Benchmarks
+cc_test(
+    name = "hintless_simplepir_benchmarks",
+    srcs = ["hintless_simplepir_benchmarks.cc"],
+    deps = [
+        ":client",
+        ":database",
+        ":parameters",
+        ":server",
+        ":utils",
+        "//linpir:parameters",
+        "//lwe:types",
+        "@com_github_google_benchmark//:benchmark",
+        "@com_github_google_googletest//:gtest",
+        "@com_github_google_shell-encryption//shell_encryption:montgomery",
+        "@com_github_google_shell-encryption//shell_encryption/testing:status_testing",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/flags:parse",
+        "@com_google_absl//absl/random",
+        "@com_google_absl//absl/time",
+    ],
+)

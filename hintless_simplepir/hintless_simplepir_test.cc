@@ -15,14 +15,12 @@
 #include <memory>
 #include <string>
 
-#include "absl/random/random.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "hintless_simplepir/client.h"
 #include "hintless_simplepir/database.h"
 #include "hintless_simplepir/parameters.h"
 #include "hintless_simplepir/server.h"
-#include "hintless_simplepir/utils.h"
 #include "linpir/parameters.h"
 #include "shell_encryption/testing/status_testing.h"
 
@@ -53,26 +51,10 @@ const Parameters kParameters{
     .prng_type = rlwe::PRNG_TYPE_HKDF,
 };
 
-static std::string GenerateRandomRecord(const Parameters& params) {
-  int num_bytes = DivAndRoundUp(params.db_record_bit_size, 8);
-  std::string record(num_bytes, 0);
-  absl::BitGen bitgen;
-  for (int i = 0; i < num_bytes; ++i) {
-    record[i] = absl::Uniform<unsigned char>(bitgen);
-  }
-  char mask = (1 << (params.db_record_bit_size % 8)) - 1;
-  record[num_bytes - 1] = record[num_bytes - 1] & mask;
-  return record;
-}
-
 TEST(HintlessSimplePir, EndToEndTest) {
   // Create server and fill in random database records.
-  ASSERT_OK_AND_ASSIGN(auto server, Server::Create(kParameters));
-
-  Database* database = server->GetDatabase();
-  for (int i = 0; i < kParameters.db_rows * kParameters.db_cols; ++i) {
-    ASSERT_OK(database->Append(GenerateRandomRecord(kParameters)));
-  }
+  ASSERT_OK_AND_ASSIGN(auto server,
+                       Server::CreateWithRandomDatabaseRecords(kParameters));
 
   // Preprocess the server and get public parameters.
   ASSERT_OK(server->Preprocess());
@@ -86,6 +68,7 @@ TEST(HintlessSimplePir, EndToEndTest) {
   ASSERT_OK_AND_ASSIGN(auto response, server->HandleRequest(request));
   ASSERT_OK_AND_ASSIGN(auto record, client->RecoverRecord(response));
 
+  const Database* database = server->GetDatabase();
   ASSERT_OK_AND_ASSIGN(auto expected, database->Record(1));
   EXPECT_EQ(record, expected);
 }
@@ -97,12 +80,8 @@ TEST(HintlessSimplePir, EndToEndTestWithChaChaPrng) {
   params.prng_type = rlwe::PRNG_TYPE_CHACHA;
 
   // Create server and fill in random database records.
-  ASSERT_OK_AND_ASSIGN(auto server, Server::Create(params));
-
-  Database* database = server->GetDatabase();
-  for (int i = 0; i < params.db_rows * params.db_cols; ++i) {
-    ASSERT_OK(database->Append(GenerateRandomRecord(params)));
-  }
+  ASSERT_OK_AND_ASSIGN(auto server,
+                       Server::CreateWithRandomDatabaseRecords(params));
 
   // Preprocess the server and get public parameters.
   ASSERT_OK(server->Preprocess());
@@ -116,6 +95,7 @@ TEST(HintlessSimplePir, EndToEndTestWithChaChaPrng) {
   ASSERT_OK_AND_ASSIGN(auto response, server->HandleRequest(request));
   ASSERT_OK_AND_ASSIGN(auto record, client->RecoverRecord(response));
 
+  const Database* database = server->GetDatabase();
   ASSERT_OK_AND_ASSIGN(auto expected, database->Record(1));
   EXPECT_EQ(record, expected);
 }

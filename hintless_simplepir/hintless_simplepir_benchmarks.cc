@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <cstdint>
 #include <memory>
 #include <string>
 
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
-#include "absl/random/random.h"
 #include "benchmark/benchmark.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -25,7 +25,6 @@
 #include "hintless_simplepir/database.h"
 #include "hintless_simplepir/parameters.h"
 #include "hintless_simplepir/server.h"
-#include "hintless_simplepir/utils.h"
 #include "linpir/parameters.h"
 #include "shell_encryption/testing/status_testing.h"
 
@@ -59,33 +58,18 @@ const Parameters kParameters{
     .prng_type = rlwe::PRNG_TYPE_HKDF,
 };
 
-static std::string GenerateRandomRecord(const Parameters& params) {
-  int num_bytes = DivAndRoundUp(params.db_record_bit_size, 8);
-  std::string record(num_bytes, 0);
-  absl::BitGen bitgen;
-  for (int i = 0; i < num_bytes; ++i) {
-    record[i] = absl::Uniform<unsigned char>(bitgen);
-  }
-  char mask = (1 << (params.db_record_bit_size % 8)) - 1;
-  record[num_bytes - 1] = record[num_bytes - 1] & mask;
-  return record;
-}
-
 void BM_HintlessPirRlwe64(benchmark::State& state) {
-  int num_rows = absl::GetFlag(FLAGS_num_rows);
-  int num_cols = absl::GetFlag(FLAGS_num_cols);
+  int64_t num_rows = absl::GetFlag(FLAGS_num_rows);
+  int64_t num_cols = absl::GetFlag(FLAGS_num_cols);
   Parameters params = kParameters;
   params.db_rows = num_rows;
   params.db_cols = num_cols;
 
   // Create server and fill in random database records.
-  auto server = Server::Create(params).value();
+  auto server = Server::CreateWithRandomDatabaseRecords(params).value();
+  const Database* database = server->GetDatabase();
+  ASSERT_EQ(database->NumRecords(), num_rows * num_cols);
 
-  Database* database = server->GetDatabase();
-  for (int i = 0; i < params.db_rows * params.db_cols; ++i) {
-    auto status = database->Append(GenerateRandomRecord(params));
-    ASSERT_OK(status);
-  }
   // Preprocess the server and get public parameters.
   ASSERT_OK(server->Preprocess());
   auto public_params = server->GetPublicParams();

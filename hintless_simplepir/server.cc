@@ -40,12 +40,23 @@
 namespace hintless_pir {
 namespace hintless_simplepir {
 
-absl::StatusOr<std::unique_ptr<Server>> Server::Create(
-    const Parameters& params) {
+namespace {
+
+// Returns an error if `params` uses an invalid PRNG type.
+inline absl::Status CheckForValidPrngType(const Parameters& params) {
   if (!(params.prng_type == rlwe::PRNG_TYPE_HKDF ||
         params.prng_type == rlwe::PRNG_TYPE_CHACHA)) {
     return absl::InvalidArgumentError("Invalid PRNG type in `params`.");
   }
+  return absl::OkStatus();
+}
+
+}  // namespace
+
+absl::StatusOr<std::unique_ptr<Server>> Server::Create(
+    const Parameters& params) {
+  RLWE_RETURN_IF_ERROR(CheckForValidPrngType(params));
+
   // Create RLWE contexts, one per plaintext modulus in `ts`.
   auto const& rlwe_params = params.linpir_params;
   int num_linpir_instances = rlwe_params.ts.size();
@@ -62,6 +73,31 @@ absl::StatusOr<std::unique_ptr<Server>> Server::Create(
 
   // Create a Database object holding the database and hint matrices.
   RLWE_ASSIGN_OR_RETURN(auto database, Database::Create(params));
+
+  return absl::WrapUnique(
+      new Server(params, std::move(database), std::move(rlwe_contexts)));
+}
+
+absl::StatusOr<std::unique_ptr<Server>> Server::CreateWithRandomDatabaseRecords(
+    const Parameters& params) {
+  RLWE_RETURN_IF_ERROR(CheckForValidPrngType(params));
+
+  // Create RLWE contexts, one per plaintext modulus in `ts`.
+  auto const& rlwe_params = params.linpir_params;
+  int num_linpir_instances = rlwe_params.ts.size();
+  std::vector<std::unique_ptr<const RlweRnsContext>> rlwe_contexts;
+  rlwe_contexts.reserve(num_linpir_instances);
+  for (int i = 0; i < num_linpir_instances; ++i) {
+    RLWE_ASSIGN_OR_RETURN(
+        auto rlwe_context,
+        RlweRnsContext::CreateForBfvFiniteFieldEncoding(
+            rlwe_params.log_n, rlwe_params.qs, /*ps=*/{}, rlwe_params.ts[i]));
+    rlwe_contexts.push_back(
+        std::make_unique<const RlweRnsContext>(std::move(rlwe_context)));
+  }
+
+  // Create a Databas holding random records.
+  RLWE_ASSIGN_OR_RETURN(auto database, Database::CreateRandom(params));
 
   return absl::WrapUnique(
       new Server(params, std::move(database), std::move(rlwe_contexts)));

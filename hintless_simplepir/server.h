@@ -42,6 +42,10 @@ class Server {
   static absl::StatusOr<std::unique_ptr<Server>> Create(
       const Parameters& params);
 
+  // Creates a server holding a random database supporting the given parameters.
+  static absl::StatusOr<std::unique_ptr<Server>>
+  CreateWithRandomDatabaseRecords(const Parameters& params);
+
   // Refreshes the server's public parameters and preprocess the database and
   // LinPir servers. The server's public parameters are used by the clients to
   // generate their requests, accessible via `GetPublicParams()`. This should

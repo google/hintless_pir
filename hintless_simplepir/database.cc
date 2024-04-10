@@ -15,6 +15,7 @@
 #include "hintless_simplepir/database.h"
 
 #include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <string>
 #include <tuple>
@@ -49,6 +50,44 @@ absl::StatusOr<std::unique_ptr<Database>> Database::Create(
   return absl::WrapUnique(
       new Database(parameters, /*lwe_query_pad=*/nullptr, /*num_records=*/0,
                    std::move(data_matrices), std::move(hint_matrices)));
+}
+
+namespace {
+
+// Function object to generate random data matrix entries.
+struct RandomValueOp {
+  int num_bits;
+
+  inline lwe::Integer operator()() const {
+    lwe::Integer r = std::rand();
+    lwe::Integer mask = (lwe::Integer{1} << num_bits) - 1;
+    return r & mask;
+  }
+};
+
+}  // namespace
+
+absl::StatusOr<std::unique_ptr<Database>> Database::CreateRandom(
+    const Parameters& parameters) {
+  // Initialize the data and the hint matrices for all shards.
+  int num_shards = DivAndRoundUp(parameters.db_record_bit_size,
+                                 parameters.lwe_plaintext_bit_size);
+  std::vector<lwe::Matrix> data_matrices(num_shards);
+  std::vector<lwe::Matrix> hint_matrices(num_shards);
+  for (int i = 0; i < num_shards; ++i) {
+    // Generate a random matrix.
+    data_matrices[i] = lwe::Matrix::NullaryExpr(
+        parameters.db_rows, parameters.db_cols,
+        RandomValueOp{parameters.lwe_plaintext_bit_size});
+    // Hint cannot be computed until the LWE pad matrix is set.
+    hint_matrices[i] =
+        lwe::Matrix::Zero(parameters.db_rows, parameters.lwe_secret_dim);
+  }
+  int64_t num_records =
+      static_cast<int64_t>(parameters.db_rows) * parameters.db_cols;
+  return absl::WrapUnique(new Database(parameters, /*lwe_query_pad=*/nullptr,
+                                       num_records, std::move(data_matrices),
+                                       std::move(hint_matrices)));
 }
 
 absl::Status Database::UpdateLweQueryPad(const lwe::Matrix* lwe_query_pad) {

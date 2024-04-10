@@ -45,6 +45,10 @@ class Database {
   static absl::StatusOr<std::unique_ptr<Database>> Create(
       const Parameters& parameters);
 
+  // Returns a database with random records for the given parameters.
+  static absl::StatusOr<std::unique_ptr<Database>> CreateRandom(
+      const Parameters& parameters);
+
   // Sets the LWE "A" matrix used by the SimplePIR protocol.
   absl::Status UpdateLweQueryPad(const lwe::Matrix* lwe_query_pad);
 

@@ -163,13 +163,123 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "database_benchmarks",
+    srcs = ["database_benchmarks.cc"],
+    deps = [
+        ":database",
+        ":parameters",
+        "//linpir:parameters",
+        "//lwe:types",
+        "@com_github_google_benchmark//:benchmark",
+        "@com_github_google_googletest//:gtest",
+        "@com_github_google_shell-encryption//shell_encryption:montgomery",
+        "@com_github_google_shell-encryption//shell_encryption/testing:status_testing",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/flags:parse",
+        "@com_google_absl//absl/time",
+    ],
+)
+
+# highway-based matrix-vector multiplication.
+cc_library(
+    name = "inner_product_hwy",
+    srcs = ["inner_product_hwy.cc"],
+    hdrs = ["inner_product_hwy.h"],
+    deps = [
+        "//lwe:types",
+        "@com_github_google_highway//:hwy",
+        "@com_google_absl//absl/base:core_headers",
+        "@com_google_absl//absl/numeric:int128",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/status:statusor",
+        "@com_google_absl//absl/types:span",
+    ],
+)
+
+# Build and test :inner_product_hwy on platforms without vector intrinsics.
+cc_library(
+    name = "inner_product_hwy_scalar",
+    srcs = ["inner_product_hwy.cc"],
+    hdrs = ["inner_product_hwy.h"],
+    local_defines = ["HWY_COMPILE_ONLY_SCALAR"],
+    deps = [
+        "//lwe:types",
+        "@com_github_google_highway//:hwy",
+        "@com_google_absl//absl/base:core_headers",
+        "@com_google_absl//absl/numeric:int128",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/status:statusor",
+        "@com_google_absl//absl/types:span",
+    ],
+)
+
+# highway-based database implementation.
+cc_library(
+    name = "database_hwy",
+    srcs = ["database_hwy.cc"],
+    hdrs = ["database_hwy.h"],
+    deps = [
+        ":inner_product_hwy",
+        ":parameters",
+        ":utils",
+        "//lwe:types",
+        "@com_github_google_shell-encryption//shell_encryption:statusor_fork",
+        "@com_gitlab_libeigen-eigen//:eigen3",
+        "@com_google_absl//absl/memory",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/status:statusor",
+        "@com_google_absl//absl/strings:string_view",
+        "@com_google_absl//absl/types:span",
+    ],
+)
+
+cc_test(
+    name = "database_hwy_test",
+    srcs = ["database_hwy_test.cc"],
+    deps = [
+        ":database_hwy",
+        ":parameters",
+        ":testing",
+        ":utils",
+        "//lwe:lwe_symmetric_encryption",
+        "//lwe:types",
+        "@com_github_google_googletest//:gtest_main",
+        "@com_github_google_shell-encryption//shell_encryption/testing:matchers",
+        "@com_github_google_shell-encryption//shell_encryption/testing:status_testing",
+        "@com_github_google_shell-encryption//shell_encryption/testing:testing_prng",
+        "@com_gitlab_libeigen-eigen//:eigen3",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/types:span",
+    ],
+)
+
+cc_test(
+    name = "database_hwy_benchmarks",
+    srcs = ["database_hwy_benchmarks.cc"],
+    deps = [
+        ":database_hwy",
+        ":parameters",
+        ":testing",
+        "//linpir:parameters",
+        "//lwe:types",
+        "@com_github_google_benchmark//:benchmark",
+        "@com_github_google_googletest//:gtest",
+        "@com_github_google_shell-encryption//shell_encryption:montgomery",
+        "@com_github_google_shell-encryption//shell_encryption/testing:status_testing",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/flags:parse",
+        "@com_google_absl//absl/time",
+    ],
+)
+
 # Hintless SimplePIR server.
 cc_library(
     name = "server",
     srcs = ["server.cc"],
     hdrs = ["server.h"],
     deps = [
-        ":database",
+        ":database_hwy",
         ":parameters",
         ":serialization_cc_proto",
         ":utils",
@@ -195,7 +305,7 @@ cc_test(
     name = "server_test",
     srcs = ["server_test.cc"],
     deps = [
-        ":database",
+        ":database_hwy",
         ":parameters",
         ":server",
         ":testing",
@@ -266,7 +376,7 @@ cc_test(
     srcs = ["hintless_simplepir_test.cc"],
     deps = [
         ":client",
-        ":database",
+        ":database_hwy",
         ":parameters",
         ":server",
         "//linpir:parameters",
@@ -286,7 +396,7 @@ cc_test(
     srcs = ["hintless_simplepir_benchmarks.cc"],
     deps = [
         ":client",
-        ":database",
+        ":database_hwy",
         ":parameters",
         ":server",
         "//linpir:parameters",

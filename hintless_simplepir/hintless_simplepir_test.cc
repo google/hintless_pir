@@ -18,7 +18,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "hintless_simplepir/client.h"
-#include "hintless_simplepir/database.h"
+#include "hintless_simplepir/database_hwy.h"
 #include "hintless_simplepir/parameters.h"
 #include "hintless_simplepir/server.h"
 #include "linpir/parameters.h"

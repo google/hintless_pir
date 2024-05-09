@@ -25,9 +25,16 @@
 namespace hintless_pir {
 namespace lwe {
 
+// Unsigned integer type to store an LWE ciphertext element. Either uint32_t or
+// uint64_t for practical LWE parameters.
 using Integer = uint32_t;
 using Matrix = Eigen::Matrix<Integer, Eigen::Dynamic, Eigen::Dynamic>;
 using Vector = Eigen::Vector<Integer, Eigen::Dynamic>;
+
+// Unsigned integer type to store an LWE plaintext element. This will be the
+// type of the database element. Either uint8_t or uint16_t for practical LWE
+// parameters.
+using PlainInteger = uint8_t;
 
 // Required to use Eigen without templates, see
 // https://eigen.tuxfamily.org/dox/TopicFunctionTakingEigenTypes.html

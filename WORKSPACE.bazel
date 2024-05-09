@@ -136,10 +136,10 @@ tink_cc_deps_init()
 # https://github.com/google/shell-encryption
 http_archive(
     name = "com_github_google_shell-encryption",
-    sha256 = "b2bad01c66debc8f437580f2016e8701f3487d473b3e7cb27e78f36b33b256ba",
-    strip_prefix = "shell-encryption-8eecd054a939788db923ad1e28787858f47c0aa3",
+    sha256 = "0a3a48cb61445e5a12b42f9787560f91e849fcea90ee3f26cafa64e5367748d7",
+    strip_prefix = "shell-encryption-3b1bdfad1bf67a1414cce7bc0684a3cffd231aa3",
     urls = [
-        "https://github.com/google/shell-encryption/archive/8eecd054a939788db923ad1e28787858f47c0aa3.zip",
+        "https://github.com/google/shell-encryption/archive/3b1bdfad1bf67a1414cce7bc0684a3cffd231aa3.zip",
     ],
 )
 
@@ -151,5 +151,16 @@ http_archive(
     strip_prefix = "eigen-3.4.0",
     urls = [
         "https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.zip",
+    ],
+)
+
+# Highway for SIMD operations.
+# https://github.com/google/highway
+http_archive(
+    name = "com_github_google_highway",
+    sha256 = "e9a9e1d2c7a607d4bce48b75f83eb25a8e802e6fe065bcd5dd770b79034ac6b9",
+    strip_prefix = "highway-3af6ba57bf82c861870f92f0483149439007d652",
+    urls = [
+        "https://github.com/google/highway/archive/3af6ba57bf82c861870f92f0483149439007d652.zip",
     ],
 )

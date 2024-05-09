@@ -21,7 +21,7 @@
 #include "absl/status/status.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "hintless_simplepir/database.h"
+#include "hintless_simplepir/database_hwy.h"
 #include "hintless_simplepir/parameters.h"
 #include "hintless_simplepir/testing.h"
 #include "hintless_simplepir/utils.h"
@@ -122,14 +122,18 @@ TEST_F(ServerTest, Preprocess) {
   int num_shards = DivAndRoundUp(kParameters.db_record_bit_size,
                                  kParameters.lwe_plaintext_bit_size);
   ASSERT_EQ(database->Data().size(), num_shards);
-  for (const lwe::Matrix& data_matrix : database->Data()) {
-    EXPECT_EQ(data_matrix.rows(), kParameters.db_rows);
-    EXPECT_EQ(data_matrix.cols(), kParameters.db_cols);
+  int num_values_per_block =
+      sizeof(Database::BlockType) / sizeof(lwe::PlainInteger);
+  int expected_num_blocks_per_column =
+      DivAndRoundUp(kParameters.db_rows, num_values_per_block);
+  for (const Database::RawMatrix& data_matrix : database->Data()) {
+    EXPECT_EQ(data_matrix.size(), kParameters.db_cols);
+    EXPECT_EQ(data_matrix[0].size(), expected_num_blocks_per_column);
   }
   ASSERT_EQ(database->Hints().size(), num_shards);
-  for (const lwe::Matrix& hint_matrix : database->Hints()) {
-    EXPECT_EQ(hint_matrix.rows(), kParameters.db_rows);
-    EXPECT_EQ(hint_matrix.cols(), kParameters.lwe_secret_dim);
+  for (const Database::LweMatrix& hint_matrix : database->Hints()) {
+    EXPECT_EQ(hint_matrix.size(), kParameters.db_rows);
+    EXPECT_EQ(hint_matrix[0].size(), kParameters.lwe_secret_dim);
   }
 }
 

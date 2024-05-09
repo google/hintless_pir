@@ -214,15 +214,16 @@ absl::StatusOr<std::string> Client::RecoverRecord(
   std::vector<lwe::Integer> values;
   values.reserve(response.ct_records_size());
   for (int i = 0; i < response.ct_records_size(); ++i) {
-    lwe::Vector ct_records = DeserializeLweCiphertext(response.ct_records(i));
-    if (ct_records.rows() != params_.db_rows) {
+    std::vector<lwe::Integer> ct_records =
+        DeserializeLweCiphertext(response.ct_records(i));
+    if (ct_records.size() != params_.db_rows) {
       return absl::InvalidArgumentError(absl::StrCat(
           "The server response has incorrect dimension; got ",
-          ct_records.rows(), " but expecting ", params_.db_rows, "."));
+          ct_records.size(), " but expecting ", params_.db_rows, "."));
     }
 
     // Remove hint * s from the server response, which gives us \Delta * m + e.
-    lwe::Vector noisy_plaintext = ct_records.row(state_.row_idx);
+    lwe::Vector noisy_plaintext{{ct_records[state_.row_idx]}};
     noisy_plaintext[0] -= decryption_parts[i][state_.row_idx];
 
     // Remove the error e.

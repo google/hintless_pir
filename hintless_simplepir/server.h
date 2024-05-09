@@ -24,7 +24,7 @@
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/string_view.h"
-#include "hintless_simplepir/database.h"
+#include "hintless_simplepir/database_hwy.h"
 #include "hintless_simplepir/parameters.h"
 #include "hintless_simplepir/serialization.pb.h"
 #include "linpir/database.h"

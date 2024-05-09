@@ -174,12 +174,15 @@ Database<RlweInteger>::InnerProductWithPreprocessedPads(
   std::vector<RnsCiphertext> ct_inner_products;
   ct_inner_products.reserve(diagonals_.size());
   for (int i = 0; i < diagonals_.size(); ++i) {
-    RLWE_ASSIGN_OR_RETURN(RnsCiphertext ct_inner_product,
-                          ct_rotated_queries[0].AbsorbSimple(diagonals_[i][0]));
-    for (int j = 1; j < ct_rotated_queries.size(); ++j) {
-      RLWE_RETURN_IF_ERROR(ct_inner_product.FusedAbsorbAddInPlaceWithoutPad(
-          ct_rotated_queries[j], diagonals_[i][j]));
+    auto error_params = ct_rotated_queries[0].ErrorParams();
+    RnsCiphertext ct_inner_product(
+        RnsCiphertext::CreateZero(moduli_, error_params));
+    for (int j = 0; j < ct_rotated_queries.size(); ++j) {
+      RLWE_RETURN_IF_ERROR(
+          ct_inner_product.FusedAbsorbAddInPlaceWithoutPadLazily(
+              ct_rotated_queries[j], diagonals_[i][j]));
     }
+    RLWE_RETURN_IF_ERROR(ct_inner_product.MergeLazyOperations());
     RLWE_RETURN_IF_ERROR(
         ct_inner_product.SetPadComponent(pad_inner_products_[i]));
     ct_inner_products.push_back(std::move(ct_inner_product));

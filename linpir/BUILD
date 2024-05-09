@@ -59,6 +59,7 @@ cc_library(
         "@com_github_google_shell-encryption//shell_encryption:montgomery",
         "@com_github_google_shell-encryption//shell_encryption:statusor_fork",
         "@com_github_google_shell-encryption//shell_encryption/rns:finite_field_encoder",
+        "@com_github_google_shell-encryption//shell_encryption/rns:lazy_rns_polynomial",
         "@com_github_google_shell-encryption//shell_encryption/rns:rns_bfv_ciphertext",
         "@com_github_google_shell-encryption//shell_encryption/rns:rns_ciphertext",
         "@com_github_google_shell-encryption//shell_encryption/rns:rns_context",

@@ -27,7 +27,7 @@
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/string_view.h"
-#include "hintless_simplepir/database.h"
+#include "hintless_simplepir/database_hwy.h"
 #include "hintless_simplepir/parameters.h"
 #include "hintless_simplepir/serialization.pb.h"
 #include "hintless_simplepir/utils.h"
@@ -151,14 +151,16 @@ namespace {
 // Given `matrix` with mod-q entries, returns `matrix` mod p, where modular
 // numbers are in balanced representation.
 template <typename Integer>
-std::vector<std::vector<Integer>> EncodeLweMatrix(const lwe::Matrix& matrix,
-                                                  Integer q, Integer p) {
+std::vector<std::vector<Integer>> EncodeLweMatrix(
+    const Database::LweMatrix& matrix, Integer q, Integer p) {
   Integer q_half = q >> 1;
-  std::vector<std::vector<Integer>> matrix_mod_p(matrix.rows());
-  for (int i = 0; i < matrix.rows(); ++i) {
-    matrix_mod_p[i].reserve(matrix.cols());
-    for (int j = 0; j < matrix.cols(); ++j) {
-      Integer x = static_cast<Integer>(matrix(i, j));
+  int num_rows = matrix.size();
+  int num_cols = matrix[0].size();
+  std::vector<std::vector<Integer>> matrix_mod_p(num_rows);
+  for (int i = 0; i < num_rows; ++i) {
+    matrix_mod_p[i].reserve(num_cols);
+    for (int j = 0; j < num_cols; ++j) {
+      Integer x = static_cast<Integer>(matrix[i][j]);
       matrix_mod_p[i].push_back(ConvertModulus(x, q, p, q_half));
     }
   }
@@ -189,7 +191,7 @@ absl::Status Server::Preprocess() {
     // One LinPir database per shard, for the current plaintext modulus.
     std::vector<std::unique_ptr<LinPirDatabase>> linpir_databases_mod_tk;
     linpir_databases_mod_tk.reserve(num_shards);
-    for (const lwe::Matrix& hint : database_->Hints()) {
+    for (const Database::LweMatrix& hint : database_->Hints()) {
       std::vector<std::vector<RlweInteger>> hint_mod_tk =
           EncodeLweMatrix(hint, lwe_modulus, plaintext_modulus);
       RLWE_ASSIGN_OR_RETURN(
@@ -226,9 +228,9 @@ absl::StatusOr<HintlessPirResponse> Server::HandleRequest(
 
   HintlessPirResponse response;
   // Handle the LWE part of the request.
-  lwe::Vector ct_query_vector =
+  Database::LweVector ct_query_vector =
       DeserializeLweCiphertext(request.ct_query_vector());
-  RLWE_ASSIGN_OR_RETURN(std::vector<lwe::Vector> ct_records,
+  RLWE_ASSIGN_OR_RETURN(std::vector<Database::LweVector> ct_records,
                         database_->InnerProductWith(ct_query_vector));
   for (auto& ct_record : ct_records) {
     *response.add_ct_records() = SerializeLweCiphertext(ct_record);

@@ -130,11 +130,19 @@ inline SerializedLweCiphertext SerializeLweCiphertext(
   return serialized;
 }
 
-inline lwe::Vector DeserializeLweCiphertext(
+inline SerializedLweCiphertext SerializeLweCiphertext(
+    const std::vector<lwe::Integer>& ct_vector) {
+  SerializedLweCiphertext serialized;
+  serialized.mutable_b_coeffs()->Reserve(ct_vector.size());
+  serialized.mutable_b_coeffs()->Add(ct_vector.begin(), ct_vector.end());
+  return serialized;
+}
+
+inline std::vector<lwe::Integer> DeserializeLweCiphertext(
     const SerializedLweCiphertext& serialized) {
-  Eigen::Map<const lwe::Vector> map(serialized.b_coeffs().data(),
-                                    serialized.b_coeffs_size());
-  return map;
+  std::vector<lwe::Integer> vec(serialized.b_coeffs().begin(),
+                                serialized.b_coeffs().end());
+  return vec;
 }
 
 // Given an integer `x` representing a mod-q number, returns `x` mod p, where

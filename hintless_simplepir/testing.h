@@ -17,6 +17,7 @@
 #define HINTLESS_PIR_HINTLESS_SIMPLEPIR_TESTING_H_
 
 #include <string>
+#include <vector>
 
 #include "absl/random/random.h"
 #include "hintless_simplepir/parameters.h"
@@ -39,6 +40,16 @@ inline static std::string GenerateRandomRecord(const Parameters& params) {
     record[num_bytes - 1] = record[num_bytes - 1] & mask;
   }
   return record;
+}
+
+inline static std::vector<Parameters::LweInteger> GenerateRandomQuery(
+    int num_values) {
+  absl::BitGen bitgen;
+  std::vector<Parameters::LweInteger> query(num_values, 0);
+  for (int i = 0; i < num_values; ++i) {
+    query[i] = absl::Uniform<Parameters::LweInteger>(bitgen);
+  }
+  return query;
 }
 
 }  // namespace testing

@@ -14,6 +14,7 @@
 
 #include "hintless_simplepir/database_hwy.h"
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
@@ -109,7 +110,7 @@ TEST_F(DatabaseTest, AppendFailsIfDatabaseIsFull) {
 
   ASSERT_OK_AND_ASSIGN(auto database, Database::Create(params));
   ASSERT_OK(database->UpdateLweQueryPad(this->lwe_query_pad_.get()));
-  for (int i = 0; i < params.db_rows * params.db_cols; ++i) {
+  for (int64_t i = 0; i < params.db_rows * params.db_cols; ++i) {
     std::string record = testing::GenerateRandomRecord(params);
     ASSERT_OK(database->Append(record));
   }

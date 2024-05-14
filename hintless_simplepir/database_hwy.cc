@@ -135,8 +135,7 @@ absl::StatusOr<std::unique_ptr<Database>> Database::CreateRandom(
     hint_matrices[i] =
         CreateZeroMatrix(parameters.db_rows, parameters.lwe_secret_dim);
   }
-  int64_t num_records =
-      static_cast<int64_t>(parameters.db_rows) * parameters.db_cols;
+  int64_t num_records = parameters.db_rows * parameters.db_cols;
   return absl::WrapUnique(new Database(parameters, /*lwe_query_pad=*/nullptr,
                                        num_records, std::move(data_matrices),
                                        std::move(hint_matrices)));

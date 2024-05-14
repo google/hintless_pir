@@ -16,6 +16,8 @@
 #ifndef HINTLESS_PIR_HINTLESS_SIMPLEPIR_PARAMETERS_H_
 #define HINTLESS_PIR_HINTLESS_SIMPLEPIR_PARAMETERS_H_
 
+#include <cstdint>
+
 #include "linpir/parameters.h"
 #include "lwe/types.h"
 #include "shell_encryption/serialization.pb.h"
@@ -28,8 +30,8 @@ struct Parameters {
   using LweInteger = lwe::Integer;
   using RlweInteger = linpir::Uint64;
 
-  int db_rows;
-  int db_cols;
+  int64_t db_rows;
+  int64_t db_cols;
   int db_record_bit_size;
 
   int lwe_secret_dim;

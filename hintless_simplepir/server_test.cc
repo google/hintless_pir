@@ -14,6 +14,7 @@
 
 #include "hintless_simplepir/server.h"
 
+#include <cstdint>
 #include <memory>
 #include <string>
 
@@ -67,7 +68,7 @@ class ServerTest : public ::testing::Test {
     // Creates a server and fill in the database with random records.
     server_ = Server::Create(kParameters).value();
     auto database = server_->GetDatabase();
-    for (int i = 0; i < kParameters.db_rows * kParameters.db_cols; ++i) {
+    for (int64_t i = 0; i < kParameters.db_rows * kParameters.db_cols; ++i) {
       CHECK_OK(database->Append(testing::GenerateRandomRecord(kParameters)));
     }
   }
@@ -124,8 +125,8 @@ TEST_F(ServerTest, Preprocess) {
   ASSERT_EQ(database->Data().size(), num_shards);
   int num_values_per_block =
       sizeof(Database::BlockType) / sizeof(lwe::PlainInteger);
-  int expected_num_blocks_per_column =
-      DivAndRoundUp(kParameters.db_rows, num_values_per_block);
+  int expected_num_blocks_per_column = DivAndRoundUp(
+      static_cast<int>(kParameters.db_rows), num_values_per_block);
   for (const Database::RawMatrix& data_matrix : database->Data()) {
     EXPECT_EQ(data_matrix.size(), kParameters.db_cols);
     EXPECT_EQ(data_matrix[0].size(), expected_num_blocks_per_column);

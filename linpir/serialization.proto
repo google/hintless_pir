@@ -16,10 +16,7 @@ syntax = "proto2";
 
 package hintless_pir;
 
-import "shell_encryption/rns/serialization.proto";
-
-// For faster allocations of sub-messages.
-option cc_enable_arenas = true;
+import "shell_encryption/rns/rns_serialization.proto";
 
 // A LinPIR request sent from the client to the server.
 message LinPirRequest {

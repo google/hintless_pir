@@ -14,7 +14,6 @@
 
 # Hintless Single-Server Private Information Retrieval
 
-load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
 load("@rules_license//rules:license.bzl", "license")
 
 package(default_visibility = ["//visibility:public"])

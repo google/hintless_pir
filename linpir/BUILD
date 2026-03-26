@@ -14,9 +14,10 @@
 
 # RLWE-based linear Private Information Retrieval
 
-load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
-load("@rules_cc//cc:defs.bzl", "cc_library")
-load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@protobuf//bazel:cc_proto_library.bzl", "cc_proto_library")
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -28,7 +29,7 @@ proto_library(
     name = "serialization_proto",
     srcs = ["serialization.proto"],
     deps = [
-        "@com_github_google_shell-encryption//shell_encryption/rns:serialization_proto",
+        "@com_github_google_shell-encryption//shell_encryption/rns:rns_serialization_proto",
     ],
 )
 
@@ -124,7 +125,7 @@ cc_library(
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings:string_view",
         "@com_google_absl//absl/types:span",
-        "@com_google_protobuf//:protobuf_lite",
+        "@protobuf//:protobuf_lite",
     ],
 )
 

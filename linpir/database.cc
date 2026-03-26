@@ -176,7 +176,7 @@ Database<RlweInteger>::InnerProductWithPreprocessedPads(
   for (int i = 0; i < diagonals_.size(); ++i) {
     auto error_params = ct_rotated_queries[0].ErrorParams();
     RnsCiphertext ct_inner_product(
-        RnsCiphertext::CreateZero(moduli_, error_params));
+        RnsCiphertext::CreateZero(moduli_, error_params, rns_context_));
     for (int j = 0; j < ct_rotated_queries.size(); ++j) {
       RLWE_RETURN_IF_ERROR(
           ct_inner_product.FusedAbsorbAddInPlaceWithoutPadLazily(

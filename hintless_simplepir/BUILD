@@ -39,10 +39,10 @@ cc_library(
         "//lwe:types",
         "@com_github_google_shell-encryption//shell_encryption:statusor_fork",
         "@com_github_google_shell-encryption//shell_encryption/prng:single_thread_hkdf_prng",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
+        "@eigen",
     ],
 )
 
@@ -106,9 +106,9 @@ cc_library(
         ":parameters",
         ":serialization_cc_proto",
         "//lwe:types",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/strings:string_view",
         "@com_google_absl//absl/types:span",
+        "@eigen",
     ],
 )
 
@@ -135,12 +135,12 @@ cc_library(
         ":parameters",
         ":utils",
         "//lwe:types",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings:string_view",
         "@com_google_absl//absl/types:span",
+        "@eigen",
     ],
 )
 
@@ -158,9 +158,9 @@ cc_test(
         "@com_github_google_shell-encryption//shell_encryption/testing:matchers",
         "@com_github_google_shell-encryption//shell_encryption/testing:status_testing",
         "@com_github_google_shell-encryption//shell_encryption/testing:testing_prng",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/types:span",
+        "@eigen",
     ],
 )
 
@@ -226,12 +226,12 @@ cc_library(
         ":utils",
         "//lwe:types",
         "@com_github_google_shell-encryption//shell_encryption:statusor_fork",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings:string_view",
         "@com_google_absl//absl/types:span",
+        "@eigen",
     ],
 )
 
@@ -249,9 +249,9 @@ cc_test(
         "@com_github_google_shell-encryption//shell_encryption/testing:matchers",
         "@com_github_google_shell-encryption//shell_encryption/testing:status_testing",
         "@com_github_google_shell-encryption//shell_encryption/testing:testing_prng",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/types:span",
+        "@eigen",
     ],
 )
 
@@ -293,12 +293,12 @@ cc_library(
         "@com_github_google_shell-encryption//shell_encryption/prng:single_thread_chacha_prng",
         "@com_github_google_shell-encryption//shell_encryption/prng:single_thread_hkdf_prng",
         "@com_github_google_shell-encryption//shell_encryption/rns:rns_context",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:string_view",
+        "@eigen",
     ],
 )
 
@@ -344,12 +344,12 @@ cc_library(
         "@com_github_google_shell-encryption//shell_encryption/rns:crt_interpolation",
         "@com_github_google_shell-encryption//shell_encryption/rns:rns_context",
         "@com_github_google_shell-encryption//shell_encryption/rns:rns_modulus",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:string_view",
+        "@eigen",
     ],
 )
 

@@ -42,7 +42,7 @@ Once you have installed Bazel you can clone this repository and run all tests
 that are included by navigating into the root folder and running:
 
 ```bash
-bazel test //...
+CC=clang++ bazel test //...
 ```
 
 More specifically, this library depends on the following projects:

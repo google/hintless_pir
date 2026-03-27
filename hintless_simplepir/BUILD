@@ -15,9 +15,10 @@
 # An implementation of the Hintless SimplePIR scheme that uses RLWE-based
 # homomorphic encryption to remove the database-dependent "hint" in SimplePIR.
 
-load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
-load("@rules_cc//cc:defs.bzl", "cc_library")
-load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@protobuf//bazel:cc_proto_library.bzl", "cc_proto_library")
+load("@protobuf//bazel:proto_library.bzl", "proto_library")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -38,10 +39,10 @@ cc_library(
         "//lwe:types",
         "@com_github_google_shell-encryption//shell_encryption:statusor_fork",
         "@com_github_google_shell-encryption//shell_encryption/prng:single_thread_hkdf_prng",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
+        "@eigen",
     ],
 )
 
@@ -66,7 +67,7 @@ proto_library(
     srcs = ["serialization.proto"],
     deps = [
         "//linpir:serialization_proto",
-        "@com_github_google_shell-encryption//shell_encryption/rns:serialization_proto",
+        "@com_github_google_shell-encryption//shell_encryption/rns:rns_serialization_proto",
     ],
 )
 
@@ -105,9 +106,9 @@ cc_library(
         ":parameters",
         ":serialization_cc_proto",
         "//lwe:types",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/strings:string_view",
         "@com_google_absl//absl/types:span",
+        "@eigen",
     ],
 )
 
@@ -134,12 +135,12 @@ cc_library(
         ":parameters",
         ":utils",
         "//lwe:types",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings:string_view",
         "@com_google_absl//absl/types:span",
+        "@eigen",
     ],
 )
 
@@ -157,9 +158,9 @@ cc_test(
         "@com_github_google_shell-encryption//shell_encryption/testing:matchers",
         "@com_github_google_shell-encryption//shell_encryption/testing:status_testing",
         "@com_github_google_shell-encryption//shell_encryption/testing:testing_prng",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/types:span",
+        "@eigen",
     ],
 )
 
@@ -225,12 +226,12 @@ cc_library(
         ":utils",
         "//lwe:types",
         "@com_github_google_shell-encryption//shell_encryption:statusor_fork",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings:string_view",
         "@com_google_absl//absl/types:span",
+        "@eigen",
     ],
 )
 
@@ -248,9 +249,9 @@ cc_test(
         "@com_github_google_shell-encryption//shell_encryption/testing:matchers",
         "@com_github_google_shell-encryption//shell_encryption/testing:status_testing",
         "@com_github_google_shell-encryption//shell_encryption/testing:testing_prng",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/types:span",
+        "@eigen",
     ],
 )
 
@@ -292,12 +293,12 @@ cc_library(
         "@com_github_google_shell-encryption//shell_encryption/prng:single_thread_chacha_prng",
         "@com_github_google_shell-encryption//shell_encryption/prng:single_thread_hkdf_prng",
         "@com_github_google_shell-encryption//shell_encryption/rns:rns_context",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:string_view",
+        "@eigen",
     ],
 )
 
@@ -343,12 +344,12 @@ cc_library(
         "@com_github_google_shell-encryption//shell_encryption/rns:crt_interpolation",
         "@com_github_google_shell-encryption//shell_encryption/rns:rns_context",
         "@com_github_google_shell-encryption//shell_encryption/rns:rns_modulus",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:string_view",
+        "@eigen",
     ],
 )
 

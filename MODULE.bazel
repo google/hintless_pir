@@ -1,0 +1,70 @@
+"Hintless PIR"
+
+module(
+    name = "hintless_pir",
+    version = "0.0.0",
+)
+
+bazel_dep(name = "rules_license", version = "1.0.0")
+bazel_dep(name = "rules_cc", version = "0.2.17")
+bazel_dep(name = "rules_foreign_cc", version = "0.15.1")
+bazel_dep(name = "rules_go", version = "0.60.0", repo_name = "io_bazel_rules_go")
+bazel_dep(name = "rules_rust", version = "0.68.1")
+bazel_dep(name = "protobuf", version = "33.4")
+archive_override(
+    # Patches protobuf to make the Rust libraries visible. See
+    # https://github.com/protocolbuffers/protobuf/issues/23866.
+    module_name = "protobuf",
+    integrity = "sha256-mvdpd/lyYjQXZikNZrDRgnMHibNK2A3YMQ8+omVYGVk=",
+    strip_prefix = "protobuf-9ed3f7fb76c3aa2384b6bf3ef5f434896d3db5ab",
+    urls = ["https://github.com/google/protobuf/archive/9ed3f7fb76c3aa2384b6bf3ef5f434896d3db5ab.zip"],
+)
+
+bazel_dep(name = "abseil-cpp", version = "20260107.0", repo_name = "com_google_absl")
+bazel_dep(name = "boringssl", version = "0.20251002.0")
+bazel_dep(name = "googletest", version = "1.17.0.bcr.2", repo_name = "com_github_google_googletest")
+bazel_dep(name = "google_benchmark", version = "1.9.3", repo_name = "com_github_google_benchmark")
+bazel_dep(name = "gflags", version = "2.2.2.bcr.1", repo_name = "com_github_gflags_gflags")
+bazel_dep(name = "glog", version = "0.7.1.bcr.1", repo_name = "com_github_google_glog")
+bazel_dep(name = "tink_cc", version = "2.4.0", repo_name = "com_github_tink_crypto_tink_cc")
+archive_override(
+    module_name = "tink_cc",
+    integrity = "sha256-jzhD0HxEC3Qm4NIX663zXRZRkbuNwgnpwvhE2/sAOBE=",
+    strip_prefix = "tink-cc-c3deba7cc1ceccbeab35b60e7ffd045c4b0842b2",
+    urls = [
+        "https://github.com/tink-crypto/tink-cc/archive/c3deba7cc1ceccbeab35b60e7ffd045c4b0842b2.zip",
+    ],
+)
+
+bazel_dep(name = "bazel_skylib", version = "1.9.0")
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# Eigen
+bazel_dep(name = "eigen", version = "5.0.1.bcr.1")
+
+# Highway for SIMD operations.
+# https://github.com/google/highway
+bazel_dep(name = "highway", version = "1.3.0", repo_name = "com_github_google_highway")
+archive_override(
+    module_name = "highway",
+    integrity = "sha256-D23t9Y1xakgX5CqNAxJbm9tkovlgHsKtDIUIxKG5l9k=",
+    strip_prefix = "highway-9ce2d10c8a1153674fe74ce31ab50e44bbce317e",
+    urls = [
+        "https://github.com/google/highway/archive/9ce2d10c8a1153674fe74ce31ab50e44bbce317e.zip",
+    ],
+)
+
+# local_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:local.bzl", "local_repository")
+
+# SHELL for rlwe-based homomorphic encryption.
+# https://github.com/google/shell-encryption
+bazel_dep(name = "shell-encryption", version = "0.0.0", repo_name = "com_github_google_shell-encryption")
+archive_override(
+    module_name = "shell-encryption",
+    integrity = "sha256-2rPwT9YWCS8IgN+bFDAU6Pc7QJ/iiP0nXV98JqlYBeE=",
+    strip_prefix = "shell-encryption-6b521659f4bb37d88ccb981f30319c29c373c06f",
+    urls = [
+        "https://github.com/google/shell-encryption/archive/6b521659f4bb37d88ccb981f30319c29c373c06f.zip",
+    ],
+)

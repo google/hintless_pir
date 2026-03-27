@@ -14,7 +14,8 @@
 
 # Symmetric-key encryption scheme based on Learning With Errors.
 
-load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -24,7 +25,7 @@ cc_library(
         "types.h",
     ],
     deps = [
-        "@com_gitlab_libeigen-eigen//:eigen3",
+        "@eigen",
     ],
 )
 
@@ -38,11 +39,11 @@ cc_library(
         "@com_github_google_shell-encryption//shell_encryption:bits_util",
         "@com_github_google_shell-encryption//shell_encryption:statusor_fork",
         "@com_github_google_shell-encryption//shell_encryption/prng:single_thread_hkdf_prng",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/log:check",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
+        "@eigen",
     ],
 )
 
@@ -83,10 +84,10 @@ cc_library(
         "@com_github_google_shell-encryption//shell_encryption:statusor_fork",
         "@com_github_google_shell-encryption//shell_encryption/prng",
         "@com_github_google_shell-encryption//shell_encryption/prng:single_thread_hkdf_prng",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
+        "@eigen",
     ],
 )
 
@@ -101,7 +102,7 @@ cc_test(
         "@com_github_google_shell-encryption//shell_encryption/prng:single_thread_hkdf_prng",
         "@com_github_google_shell-encryption//shell_encryption/testing:matchers",
         "@com_github_google_shell-encryption//shell_encryption/testing:status_testing",
-        "@com_gitlab_libeigen-eigen//:eigen3",
         "@com_google_absl//absl/status",
+        "@eigen",
     ],
 )

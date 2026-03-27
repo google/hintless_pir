@@ -16,6 +16,8 @@
 Bazel build file for Eigen3
 """
 
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
 package(
     default_visibility = ["//visibility:public"],
 )
@@ -36,9 +38,7 @@ eigen_hdrs = glob(
 eigen_srcs = glob(
     [
         "Eigen/**/src/**/*.h",
-        "Eigen/**/src/**/*.inc",
         "unsupported/Eigen/**/src/**/*.h",
-        "unsupported/Eigen/**/src/**/*.inc",
     ],
 )
 
